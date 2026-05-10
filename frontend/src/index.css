@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 47.4% 11.2%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Dark mode overrides for common patterns */
+.dark .bg-white {
+  background-color: rgb(17 24 39);
+  /* gray-900 */
+}
+
+.dark .bg-gray-50 {
+  background-color: rgb(3 7 18);
+  /* gray-950 */
+}
+
+.dark .bg-gray-100 {
+  background-color: rgb(31 41 55);
+  /* gray-800 */
+}
+
+.dark .text-gray-900 {
+  color: rgb(243 244 246);
+  /* gray-100 */
+}
+
+.dark .text-gray-700 {
+  color: rgb(209 213 219);
+  /* gray-300 */
+}
+
+.dark .text-gray-600 {
+  color: rgb(156 163 175);
+  /* gray-400 */
+}
+
+.dark .text-gray-500 {
+  color: rgb(107 114 128);
+  /* gray-500 */
+}
+
+.dark .border-gray-200 {
+  border-color: rgb(31 41 55);
+  /* gray-800 */
+}
+
+.dark .border-gray-300 {
+  border-color: rgb(55 65 81);
+  /* gray-700 */
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: rgb(31 41 55);
+  /* gray-800 */
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: rgb(55 65 81);
+  /* gray-700 */
+}
+
+.dark .divide-gray-200> :not([hidden])~ :not([hidden]) {
+  border-color: rgb(31 41 55);
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: rgb(31 41 55);
+  color: rgb(243 244 246);
+  border-color: rgb(55 65 81);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: rgb(107 114 128);
+}
+
+/* Keep colored backgrounds but slightly darken for dark mode */
+.dark .bg-slate-50 {
+  background-color: rgb(30 58 138 / 0.2);
+}
+
+.dark .bg-green-50 {
+  background-color: rgb(6 78 59 / 0.3);
+}
+
+.dark .bg-orange-50 {
+  background-color: rgb(124 45 18 / 0.3);
+}
+
+.dark .bg-red-50 {
+  background-color: rgb(127 29 29 / 0.3);
+}
+
+.dark .bg-purple-50 {
+  background-color: rgb(76 29 149 / 0.3);
+}
+
+.dark .bg-yellow-50 {
+  background-color: rgb(113 63 18 / 0.3);
+}
+
+.dark .bg-pink-50 {
+  background-color: rgb(131 24 67 / 0.3);
+}
+
+.dark .border-slate-200 {
+  border-color: rgb(30 58 138);
+}
+
+.dark .border-green-200 {
+  border-color: rgb(6 78 59);
+}
+
+.dark .border-orange-200 {
+  border-color: rgb(124 45 18);
+}
+
+.dark .border-red-200 {
+  border-color: rgb(127 29 29);
+}
+
+.dark .border-purple-200 {
+  border-color: rgb(76 29 149);
+}
+
+.dark .border-yellow-200 {
+  border-color: rgb(113 63 18);
+}
+
+/* Table header dark */
+.dark thead.bg-gray-50 {
+  background-color: rgb(31 41 55);
+}
+
+/* Modal backdrop */
+.dark .bg-black.bg-opacity-50 {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* --- Responsive & UX Enhancements --- */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+}
+.overflow-x-auto::-webkit-scrollbar { height: 5px; }
+.overflow-x-auto::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.3); border-radius: 10px; }
+
+img { max-width: 100%; height: auto; }
+
+@media (max-width: 640px) {
+  .max-w-2xl, .max-w-4xl, .max-w-6xl, .max-w-lg {
+    max-width: 95% !important;
+    margin: 10px auto !important;
+  }
+  th, td { padding-left: 1rem !important; padding-right: 1rem !important; }
+}

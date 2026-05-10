@@ -1,0 +1,26 @@
+fastapi
+uvicorn
+sqlmodel
+sqlalchemy
+asyncpg
+python-dotenv
+pydantic
+email-validator
+pyjwt
+bcrypt
+passlib
+tzdata
+pytest
+black
+isort
+flake8
+mypy
+python-jose
+requests
+pandas
+numpy
+python-multipart
+jq
+typer
+# Removed unused/legacy: motor, pymongo, boto3, requests-oauthlib, cryptography
+

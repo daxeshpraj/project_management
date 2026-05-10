@@ -1,0 +1,38 @@
+# Environment - never commit
+.env
+**/.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+Logs/
+logs/
+backend/logs/
+*.log
+
+# Uploads (user files)
+backend/uploads/
+
+# React
+node_modules/
+frontend/node_modules/
+frontend/build/
+
+# Windows specific
+*.bat
+iis_setup*.ps1
+web.config
+backend/web.config
+frontend/public/web.config
+
+# Scratch/temp
+scratch/
+memory/
+test_reports/
+
+# Emergent markers
+.emergent/

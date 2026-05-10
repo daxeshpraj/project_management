@@ -1,0 +1,17 @@
+{
+  "name": "Aemje Architect-root",
+  "version": "1.0.0",
+  "description": "Root orchestrator for Aemje Architect project",
+  "main": "index.js",
+  "scripts": {
+    "install:frontend": "npm install --prefix frontend",
+    "install:backend": "pip install -r backend/requirements.txt",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "cd backend && uvicorn server:app --reload --port 8080",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
