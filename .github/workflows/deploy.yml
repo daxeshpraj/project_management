@@ -18,13 +18,13 @@ jobs:
           node-version: 18
 
       - name: Build React frontend
+        working-directory: frontend
         run: |
-          cd frontend
           npm install
           npm run build
         env:
           REACT_APP_BACKEND_URL: http://65.1.93.48
-	  CI: false
+          CI: "false"
 
       - name: Upload frontend to EC2
         uses: appleboy/scp-action@master
@@ -48,4 +48,4 @@ jobs:
             source venv/bin/activate
             pip install -r backend/requirements.txt --quiet
             sudo systemctl restart myapp
-            sudo systemctl restart nginxss
+            sudo systemctl restart nginx
