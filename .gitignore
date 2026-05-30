@@ -29,6 +29,9 @@ web.config
 backend/web.config
 frontend/public/web.config
 
+# Generated at build time
+frontend/src/config/hkTechLogoBase64.js
+
 # Scratch/temp
 scratch/
 memory/

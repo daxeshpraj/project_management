@@ -1,5 +1,7 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getPdfBrand } from "@/config/brand";
+import { HK_TECH_LOGO_DATA_URL } from "@/config/hkTechLogoBase64";
 
 const formatCurrency = (amount) => {
   const formatted = new Intl.NumberFormat("en-IN", {
@@ -16,44 +18,49 @@ const formatDate = (dateStr) =>
   });
 
 const addHeader = (doc, title, company) => {
-  // Header Background
-  doc.setFillColor(51, 65, 85);
-  doc.rect(0, 0, 210, 35, "F");
-  
-  // Logo Image
-  if (company?.logo_url) {
-    try {
-      doc.addImage(company.logo_url, "PNG", 14, 6, 18, 18);
-    } catch (e) {
-      doc.setFillColor(255, 255, 255);
-      doc.setTextColor(51, 65, 85);
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-      doc.text(company.name?.substring(0, 2).toUpperCase() || "AA", 18, 18);
-    }
-  } else {
-    // Fallback if logo fails to load or not provided
-    doc.setFillColor(255, 255, 255);
-    doc.setTextColor(51, 65, 85);
-    doc.setFontSize(10);
+  const brand = getPdfBrand(company);
+  const [tr, tg, tb] = brand.colors.tealRgb;
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, 210, 48, "F");
+
+  try {
+    doc.addImage(HK_TECH_LOGO_DATA_URL, "PNG", 12, 6, 52, 16);
+  } catch (e) {
+    doc.setTextColor(tr, tg, tb);
+    doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text(company?.name?.substring(0, 2).toUpperCase() || "AA", 18, 18);
+    doc.text(brand.platformName, 14, 16);
   }
-  
-  // Company Info
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text(company?.name || "Interior Platform", 38, 16);
-  
-  doc.setFontSize(9);
+
+  doc.setTextColor(51, 51, 51);
+  doc.setFontSize(7.5);
   doc.setFont("helvetica", "normal");
-  doc.text(company?.address || "Project & Vendor Management System", 38, 22);
-  
-  doc.setFontSize(11);
+  const contactX = 118;
+  doc.text(`Phone: ${brand.phone}`, contactX, 10);
+  doc.text(`Email: ${brand.email}`, contactX, 14);
   doc.setFont("helvetica", "bold");
-  doc.text(title, 38, 29);
-  
+  doc.text("Corporate Office:", contactX, 19);
+  doc.setFont("helvetica", "normal");
+  const addressLines = doc.splitTextToSize(brand.address, 88);
+  doc.text(addressLines, contactX, 23);
+
+  doc.setDrawColor(tr, tg, tb);
+  doc.setLineWidth(0.6);
+  doc.line(12, 32, 198, 32);
+
+  doc.setTextColor(tr, tg, tb);
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text(title, 12, 40);
+
+  if (brand.clientName) {
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Client: ${brand.clientName}`, 12, 45);
+  }
+
   doc.setTextColor(0, 0, 0);
 };
 
@@ -64,7 +71,7 @@ const addFooter = (doc) => {
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
     doc.text(
-      `Generated on ${new Date().toLocaleString("en-IN")} | Page ${i} of ${pageCount}`,
+      `HK Tech | Generated on ${new Date().toLocaleString("en-IN")} | Page ${i} of ${pageCount}`,
       14,
       290
     );
@@ -76,7 +83,7 @@ export const generateProjectProfitabilityPDF = (project, analytics, vendorPaymen
   const doc = new jsPDF();
   addHeader(doc, "Project Profitability Report", company);
 
-  let y = 50;
+  let y = 56;
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text(project.name, 14, y);
@@ -202,7 +209,7 @@ export const generateCustomerStatementPDF = (project, payments, outstanding, com
   const doc = new jsPDF();
   addHeader(doc, "Customer Statement", company);
 
-  let y = 50;
+  let y = 56;
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text(project.client_name, 14, y);
@@ -250,7 +257,7 @@ export const generateCustomerReceiptPDF = (payment, project, company) => {
   const doc = new jsPDF();
   addHeader(doc, "Payment Receipt", company);
 
-  let y = 45;
+  let y = 56;
   doc.setFillColor(240, 253, 244);
   doc.rect(14, y, 182, 75, "F");
 
@@ -296,7 +303,7 @@ export const generateVendorVoucherPDF = (payment, vendor, project, company) => {
   const doc = new jsPDF();
   addHeader(doc, "Vendor Payment Voucher", company);
 
-  let y = 45;
+  let y = 56;
   doc.setFillColor(254, 242, 242);
   doc.rect(14, y, 182, 85, "F");
 
@@ -343,7 +350,7 @@ export const generateAllProjectsReportPDF = (projects, vendorPayments, customerP
   const doc = new jsPDF();
   addHeader(doc, "All Projects Summary Report", company);
 
-  let y = 50;
+  let y = 56;
   const rows = projects.map((p) => {
     const received = customerPayments.filter((cp) => cp.project_id === p.id).reduce((s, cp) => s + cp.amount, 0);
     const vendorPaid = vendorPayments.filter((vp) => vp.project_id === p.id).reduce((s, vp) => s + vp.amount, 0);
@@ -379,7 +386,7 @@ export const generateGeneralExpensesPDF = (expenses, totalAmount, filters, compa
   const doc = new jsPDF();
   addHeader(doc, "General Expenses Report", company);
 
-  let y = 50;
+  let y = 56;
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text("Business Operating Expenses", 14, y);
@@ -418,7 +425,7 @@ export const generateStaffSalaryReceiptPDF = (transaction, staff, company) => {
   const doc = new jsPDF();
   addHeader(doc, "Salary Payment Receipt", company);
 
-  let y = 45;
+  let y = 56;
   doc.setFillColor(239, 246, 255); // Light blue for salary
   doc.rect(14, y, 182, 85, "F");
 
@@ -465,7 +472,7 @@ export const generateProjectLedgerPDF = (project, ledgerData, filteredLedger, co
   const doc = new jsPDF();
   addHeader(doc, "Project Detailed Ledger", company);
 
-  let y = 50;
+  let y = 56;
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text(project.name, 14, y);
@@ -536,7 +543,7 @@ export const generateStaffLedgerPDF = (staff, ledgerData, filteredTransactions, 
   const doc = new jsPDF();
   addHeader(doc, "Staff Account Ledger", company);
 
-  let y = 50;
+  let y = 56;
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text(staff.name, 14, y);
@@ -581,7 +588,7 @@ export const generateLoanLedgerPDF = (loan, details, timeline, company) => {
   const doc = new jsPDF();
   addHeader(doc, "Personal Loan Account Ledger", company);
 
-  let y = 50;
+  let y = 56;
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text(loan.person_name, 14, y);

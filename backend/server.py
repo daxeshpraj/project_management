@@ -20,7 +20,7 @@ from enum import Enum
 from sqlmodel import SQLModel, Field, Session, create_engine, select, Relationship
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text, extract
+from sqlalchemy import text, extract, or_
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -152,12 +152,12 @@ async def lifespan(app: FastAPI):
         p_res = await session.execute(select(PermissionMapping))
         if not p_res.scalars().first():
             # Defaults for ADMIN
-            modules = ['dashboard', 'projects', 'procurement', 'vendors', 'staff', 'expenses', 'reports', 'user-management', 'role-management', 'master-settings']
+            modules = ['dashboard', 'projects', 'vendors', 'staff', 'expenses', 'reports', 'user-management', 'role-management', 'master-settings']
             for m in modules:
                 session.add(PermissionMapping(role='ADMIN', module_id=m, is_enabled=True))
             
             # Defaults for STAFF
-            staff_modules = ['dashboard', 'projects', 'procurement', 'vendors', 'expenses']
+            staff_modules = ['dashboard', 'projects', 'vendors', 'expenses']
             for m in staff_modules:
                 session.add(PermissionMapping(role='STAFF', module_id=m, is_enabled=True))
             
@@ -184,13 +184,16 @@ async def global_exception_handler(request, exc):
     )
 
 # CORS Middleware
-cors_origins_str = os.environ.get("CORS_ORIGINS", "http://localhost,http://localhost:3000,http://localhost:80,http://localhost:8080")
+cors_origins_str = os.environ.get(
+    "CORS_ORIGINS",
+    "http://localhost,http://localhost:3001,http://localhost:80,http://localhost:8080,http://localhost:8089",
+)
 cors_origins = [origin.strip() for origin in cors_origins_str.split(",")]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins + ["http://localhost:3000"],
-    allow_origin_regex=r"http://.*\.lvh\.me:3000|http://.*\.localhost:3000",
+    allow_origins=cors_origins + ["http://localhost:3001", "http://localhost:8089"],
+    allow_origin_regex=r"http://.*\.lvh\.me:3001|http://.*\.localhost:3001",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -314,7 +317,7 @@ class PermissionMapping(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
     company_id: Optional[str] = Field(default=None, foreign_key="company.id", index=True)
     role: str = Field(index=True) # ADMIN, STAFF, USER
-    module_id: str = Field(index=True) # e.g. 'procurement', 'dashboard'
+    module_id: str = Field(index=True) # e.g. 'dashboard', 'projects'
     is_enabled: bool = Field(default=True)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
@@ -467,18 +470,6 @@ class LoanRepayment(SQLModel, table=True):
     type: LoanTransactionType = LoanTransactionType.RETURNED
     person_name: Optional[str] = None # Denormalized for easier DB review
     notes: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
-
-class LoosePurchase(SQLModel, table=True):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
-    company_id: Optional[str] = Field(default=None, foreign_key="company.id", index=True)
-    item_name: str
-    vendor_name: str
-    project_id: str = Field(foreign_key="project.id")
-    date: datetime
-    added_by: str  # Username of the staff member
-    image_url: Optional[str] = None
-    status: str = Field(default="ORDERED")
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
 class User(SQLModel, table=True):
@@ -1016,54 +1007,6 @@ async def delete_general_expense(expense_id: str, session: AsyncSession = Depend
     await session.delete(expense)
     await session.commit()
     return {"message": "Expense deleted successfully"}
-
-# Procurement Feed (Loose Purchases)
-@api_router.post("/purchases")
-async def create_purchase(input: LoosePurchase, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    input.date = normalize_dt(input.date)
-    if not input.added_by:
-        input.added_by = current_user.username
-    session.add(input)
-    await session.commit()
-    await session.refresh(input)
-    return input
-
-@api_router.get("/purchases")
-async def get_purchases(project_id: Optional[str] = None, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    statement = select(LoosePurchase).order_by(LoosePurchase.date.desc())
-    if project_id:
-        statement = statement.where(LoosePurchase.project_id == project_id)
-    result = await session.execute(statement)
-    return result.scalars().all()
-
-@api_router.put("/purchases/{purchase_id}")
-async def update_purchase(purchase_id: str, input: LoosePurchase, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    statement = select(LoosePurchase).where(LoosePurchase.id == purchase_id)
-    result = await session.execute(statement)
-    purchase = result.scalar_one_or_none()
-    if not purchase:
-        raise HTTPException(status_code=404, detail="Purchase not found")
-    
-    update_data = input.model_dump(exclude_unset=True, exclude={"id", "created_at"})
-    for key, value in update_data.items():
-        if key == "date":
-            value = normalize_dt(value)
-        setattr(purchase, key, value)
-    
-    await session.commit()
-    await session.refresh(purchase)
-    return purchase
-
-@api_router.delete("/purchases/{purchase_id}")
-async def delete_purchase(purchase_id: str, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    statement = select(LoosePurchase).where(LoosePurchase.id == purchase_id)
-    result = await session.execute(statement)
-    purchase = result.scalar_one_or_none()
-    if not purchase:
-        raise HTTPException(status_code=404, detail="Purchase not found")
-    await session.delete(purchase)
-    await session.commit()
-    return {"message": "Purchase deleted successfully"}
 
 @api_router.post("/upload")
 async def upload_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
@@ -1764,72 +1707,6 @@ async def import_from_excel(
         "errors": errors
     }
 
-
-# Procurement / Loose Purchase Routes
-@api_router.get("/purchases")
-async def get_purchases(project_id: Optional[str] = None, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    statement = select(LoosePurchase).where(LoosePurchase.company_id == current_user.company_id).order_by(LoosePurchase.created_at.desc())
-    if project_id:
-        statement = statement.where(LoosePurchase.project_id == project_id)
-    result = await session.execute(statement)
-    return result.scalars().all()
-
-@api_router.post("/purchases")
-async def create_purchase(purchase: LoosePurchase, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    # Automatically fetch logged in user name
-    purchase.added_by = current_user.username
-    purchase.company_id = current_user.company_id
-    session.add(purchase)
-    await session.commit()
-    await session.refresh(purchase)
-    return purchase
-
-@api_router.put("/purchases/{purchase_id}")
-async def update_purchase(purchase_id: str, purchase_update: LoosePurchase, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    statement = select(LoosePurchase).where(LoosePurchase.id == purchase_id)
-    result = await session.execute(statement)
-    db_purchase = result.scalar_one_or_none()
-    if not db_purchase:
-        raise HTTPException(status_code=404, detail="Purchase not found")
-    
-    for key, value in purchase_update.model_dump(exclude={"id", "created_at"}).items():
-        setattr(db_purchase, key, value)
-    
-    await session.commit()
-    await session.refresh(db_purchase)
-    return db_purchase
-
-@api_router.delete("/purchases/{purchase_id}")
-async def delete_purchase(purchase_id: str, session: AsyncSession = Depends(get_session), current_user: User = Depends(get_current_user)):
-    statement = select(LoosePurchase).where(LoosePurchase.id == purchase_id)
-    result = await session.execute(statement)
-    purchase = result.scalar_one_or_none()
-    if not purchase:
-        raise HTTPException(status_code=404, detail="Purchase not found")
-    await session.delete(purchase)
-    await session.commit()
-    return {"message": "Purchase deleted"}
-
-@api_router.post("/upload")
-async def upload_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
-    import shutil
-    import uuid
-    from pathlib import Path
-    
-    # Ensure upload directory exists
-    UPLOAD_DIR = Path(__file__).parent / "uploads"
-    UPLOAD_DIR.mkdir(exist_ok=True)
-    
-    file_extension = file.filename.split(".")[-1]
-    new_filename = f"{uuid.uuid4()}.{file_extension}"
-    file_path = UPLOAD_DIR / new_filename
-    
-    with file_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-        
-    return {"url": f"/uploads/{new_filename}", "filename": new_filename}
-
-
 # Analytics: Dashboard Summary
 @api_router.get("/analytics/dashboard")
 async def get_dashboard_analytics(
@@ -1895,9 +1772,11 @@ async def login(
     logger.info(f"Login attempt for user: {input.username}")
     statement = select(User).where(User.username == input.username)
     
-    # If tenant identified via subdomain/header, filter by it
+    # If tenant identified via subdomain/header, filter by it (superadmins may log in on any tenant host)
     if tenant:
-        statement = statement.where(User.company_id == tenant.id)
+        statement = statement.where(
+            or_(User.company_id == tenant.id, User.is_superadmin == True)
+        )
         
     result = await session.execute(statement)
     user = result.scalar_one_or_none()
@@ -2021,7 +1900,7 @@ async def signup(input: CompanySignup, session: AsyncSession = Depends(get_sessi
         logger.info(f"Created owner user: {user.username}")
         
         # 5. Initialize Permissions for OWNER role in this company
-        modules = ['dashboard', 'projects', 'procurement', 'vendors', 'staff', 'expenses', 'reports', 'user-management', 'role-management', 'master-settings', 'company-settings']
+        modules = ['dashboard', 'projects', 'vendors', 'staff', 'expenses', 'reports', 'user-management', 'role-management', 'master-settings', 'company-settings']
         for m in modules:
             session.add(PermissionMapping(company_id=company.id, role='OWNER', module_id=m, is_enabled=True))
             # Also add for ADMIN just in case

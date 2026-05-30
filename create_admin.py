@@ -1,7 +1,9 @@
 import requests
 
 def setup_admin():
-    url = "http://localhost:8080/api/auth/setup-admin"
+    import os
+    base = os.environ.get("PUBLIC_API_URL", "http://65.1.93.48").rstrip("/")
+    url = f"{base}/api/auth/setup-admin"
     data = {
         "username": "admin",
         "full_name": "System Administrator",

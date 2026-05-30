@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <system.webServer>
+    <handlers>
+      <add name="httpPlatformHandler" path="*" verb="*" modules="httpPlatformHandler" resourceType="Unspecified" />
+    </handlers>
+    <httpPlatform
+      processPath="%PYTHON_PATH%"
+      arguments="-m uvicorn server:app --host 127.0.0.1 --port %HTTP_PLATFORM_PORT%"
+      stdoutLogEnabled="true"
+      stdoutLogFile=".\logs\stdout"
+      startupTimeLimit="120"
+      processesPerApplication="1">
+      <environmentVariables>
+        <environmentVariable name="PYTHONPATH" value="%ROOT%\backend" />
+        <environmentVariable name="CORS_ORIGINS" value="http://localhost:8089" />
+      </environmentVariables>
+    </httpPlatform>
+  </system.webServer>
+</configuration>

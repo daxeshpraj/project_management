@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { DollarSign, TrendingUp, Briefcase, Users, Calendar, Filter, X, RefreshCcw } from "lucide-react";
+import BrandLogo from "./BrandLogo";
+import { HK_TECH_BRAND } from "@/config/brand";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -61,7 +63,7 @@ const Dashboard = ({ refreshTrigger, onNavigate, company }) => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-hk-teal mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">Loading dashboard...</p>
         </div>
       </div>
@@ -72,6 +74,13 @@ const Dashboard = ({ refreshTrigger, onNavigate, company }) => {
 
   return (
     <div className="space-y-6" data-testid="dashboard">
+      <div className="bg-white dark:bg-gray-900 border border-hk-teal/20 dark:border-gray-800 rounded-2xl p-4 md:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <BrandLogo size="lg" subtitle={company?.name ? `${company.name} workspace` : HK_TECH_BRAND.tagline} />
+        <div className="text-xs text-gray-500 dark:text-gray-400 sm:text-right space-y-0.5">
+          <p>{HK_TECH_BRAND.phone}</p>
+          <p>{HK_TECH_BRAND.email}</p>
+        </div>
+      </div>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Business Overview</h1>
@@ -101,7 +110,7 @@ const Dashboard = ({ refreshTrigger, onNavigate, company }) => {
                 key={m.id}
                 onClick={() => toggleMonth(m.id)}
                 className={`px-2 py-1 text-xs font-medium rounded-md transition-all ${selectedMonths.includes(m.id)
-                    ? 'bg-slate-900 text-white shadow-sm'
+                    ? 'bg-hk-teal text-white shadow-sm'
                     : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
               >
@@ -121,7 +130,7 @@ const Dashboard = ({ refreshTrigger, onNavigate, company }) => {
           <button
             onClick={fetchAnalytics}
             disabled={loading}
-            className="p-2 text-gray-500 hover:text-slate-900 dark:hover:text-slate-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50 ml-auto md:ml-0"
+            className="p-2 text-gray-500 hover:text-hk-teal dark:hover:text-hk-teal-light hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50 ml-auto md:ml-0"
             title="Refresh Dashboard"
           >
             <RefreshCcw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />

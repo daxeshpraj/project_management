@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Building2, User, Lock, ArrowRight, Loader2, CheckCircle2, Globe } from 'lucide-react';
+import { Building2, ArrowRight, Loader2, CheckCircle2, Globe } from 'lucide-react';
 import { toast } from 'sonner';
+import BrandLogo from './BrandLogo';
+import { HK_TECH_BRAND } from '@/config/brand';
 
 const Signup = ({ onBack }) => {
   const [step, setStep] = useState(1);
@@ -57,11 +59,11 @@ const Signup = ({ onBack }) => {
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-900 mb-4 shadow-lg">
-            <Building2 className="w-8 h-8 text-white" />
+          <div className="flex justify-center mb-4">
+            <BrandLogo showText={false} size="xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Join the Platform</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Scale your interior business with ease</p>
+          <h1 className="text-2xl font-bold text-hk-gray dark:text-white">Join {HK_TECH_BRAND.name}</h1>
+          <p className="text-hk-gray-light dark:text-gray-400 mt-2 text-sm">{HK_TECH_BRAND.tagline}</p>
         </div>
 
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-8">
@@ -76,7 +78,7 @@ const Signup = ({ onBack }) => {
                     name="company_name"
                     value={formData.company_name}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-slate-700 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-hk-teal outline-none"
                     placeholder="e.g. Dream Interiors"
                     required
                   />
@@ -89,7 +91,7 @@ const Signup = ({ onBack }) => {
                       name="subdomain"
                       value={formData.subdomain}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 pr-32 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-slate-700 outline-none"
+                      className="w-full px-4 py-2.5 pr-32 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-hk-teal outline-none"
                       placeholder="dream-interiors"
                       required
                     />
@@ -105,7 +107,7 @@ const Signup = ({ onBack }) => {
               </div>
               <button
                 onClick={() => formData.company_name && formData.subdomain ? setStep(2) : toast.error("Please fill all fields")}
-                className="w-full bg-slate-900 text-white font-semibold py-3 rounded-xl hover:bg-slate-950 flex items-center justify-center gap-2"
+                className="w-full bg-hk-teal text-white font-semibold py-3 rounded-xl hover:bg-hk-teal-dark flex items-center justify-center gap-2"
               >
                 Next Step <ArrowRight className="w-4 h-4" />
               </button>
@@ -123,7 +125,7 @@ const Signup = ({ onBack }) => {
                     name="admin_full_name"
                     value={formData.admin_full_name}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-slate-700 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-hk-teal outline-none"
                     placeholder="Enter your name"
                     required
                   />
@@ -135,7 +137,7 @@ const Signup = ({ onBack }) => {
                     name="admin_username"
                     value={formData.admin_username}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-slate-700 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-hk-teal outline-none"
                     placeholder="Choose a username"
                     required
                   />
@@ -147,7 +149,7 @@ const Signup = ({ onBack }) => {
                     name="admin_password"
                     value={formData.admin_password}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-slate-700 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-hk-teal outline-none"
                     placeholder="••••••••"
                     required
                   />
@@ -159,7 +161,7 @@ const Signup = ({ onBack }) => {
                     name="confirm_password"
                     value={formData.confirm_password}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-slate-700 outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-hk-teal outline-none"
                     placeholder="••••••••"
                     required
                   />
@@ -176,7 +178,7 @@ const Signup = ({ onBack }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-[2] bg-slate-900 text-white font-semibold py-3 rounded-xl hover:bg-slate-950 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-[2] bg-hk-teal text-white font-semibold py-3 rounded-xl hover:bg-hk-teal-dark flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Complete Registration"}
                 </button>
@@ -196,13 +198,17 @@ const Signup = ({ onBack }) => {
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
                   Your business portal is ready at:
                 </p>
-                <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-slate-900 dark:text-slate-100">
+                <div className="mt-4 p-3 bg-hk-teal/5 dark:bg-slate-800 rounded-xl border border-hk-teal/20 dark:border-slate-700 font-mono text-hk-gray dark:text-slate-100">
                   {formData.subdomain}.interiorapp.com
                 </div>
               </div>
               <button
-                onClick={() => window.location.href = `http://${formData.subdomain}.lvh.me:3000`}
-                className="w-full bg-slate-900 text-white font-semibold py-3 rounded-xl hover:bg-slate-950"
+                onClick={() => {
+                  const port = window.location.port || (process.env.NODE_ENV === 'production' ? '8089' : '3001');
+                  const host = port === '8089' ? `${formData.subdomain}.localhost` : `${formData.subdomain}.lvh.me`;
+                  window.location.href = `http://${host}:${port}`;
+                }}
+                className="w-full bg-hk-teal text-white font-semibold py-3 rounded-xl hover:bg-hk-teal-dark"
               >
                 Go to My Portal
               </button>
@@ -213,7 +219,7 @@ const Signup = ({ onBack }) => {
         {step !== 3 && (
           <p className="text-center mt-8 text-sm text-gray-500">
             Already have an account?{' '}
-            <button onClick={onBack} className="text-slate-900 font-semibold hover:underline">
+            <button onClick={onBack} className="text-hk-teal font-semibold hover:underline">
               Log in
             </button>
           </p>

@@ -7,11 +7,14 @@
     "install:frontend": "npm install --prefix frontend",
     "install:backend": "pip install -r backend/requirements.txt",
     "install:all": "npm run install:frontend && npm run install:backend",
-    "dev:frontend": "npm run dev --prefix frontend",
-    "dev:backend": "cd backend && uvicorn server:app --reload --port 8080",
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+    "dev:frontend": "cross-env PORT=3001 npm run dev --prefix frontend",
+    "dev:backend": "cd backend && uvicorn server:app --reload --port 8000",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "build:iis": "cross-env REACT_APP_BACKEND_URL=http://localhost:8089 npm run build --prefix frontend",
+    "build:aws": "cross-env REACT_APP_BACKEND_URL=http://65.1.93.48 npm run build --prefix frontend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
   }
 }

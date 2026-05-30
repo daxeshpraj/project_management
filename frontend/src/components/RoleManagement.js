@@ -13,7 +13,6 @@ import {
   Users,
   FileText,
   CreditCard,
-  MessageSquare,
   AlertCircle,
   Save,
   Loader2
@@ -28,14 +27,13 @@ const RoleManagement = () => {
   
   const roles = [
     { id: 'ADMIN', name: 'Administrator', description: 'Full access to all modules and settings' },
-    { id: 'STAFF', name: 'Staff Member', description: 'Access to projects, feed, and basic transactions' },
+    { id: 'STAFF', name: 'Staff Member', description: 'Access to projects and basic transactions' },
     { id: 'USER', name: 'General User', description: 'Limited view-only access to assigned projects' }
   ];
 
   const modules = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'projects', label: 'Projects', icon: Briefcase },
-    { id: 'procurement', label: 'Procurement Feed', icon: MessageSquare },
     { id: 'vendors', label: 'Vendors', icon: Users },
     { id: 'staff', label: 'Staff Management', icon: UserCheck },
     { id: 'expenses', label: 'Expense Tracking', icon: CreditCard },

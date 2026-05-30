@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { LayoutDashboard, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
-import { getTenantHeader } from '../utils/tenancy';
+import { Lock, User, AlertCircle, Loader2 } from 'lucide-react';
+import { getSubdomain, getTenantHeader } from '../utils/tenancy';
+import BrandLogo from './BrandLogo';
+import { HK_TECH_BRAND } from '@/config/brand';
 
 const Login = ({ onLoginSuccess, onShowSignup }) => {
   const [username, setUsername] = useState('');
@@ -28,7 +30,21 @@ const Login = ({ onLoginSuccess, onShowSignup }) => {
 
       onLoginSuccess(user);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed. Please try again.');
+      if (!err.response) {
+        const hint = getSubdomain()
+          ? 'API unreachable or wrong tenant URL. Try http://localhost:8089 without a subdomain.'
+          : 'Cannot reach the API. Confirm IIS /api is running and open http://localhost:8089/api/ping';
+        setError(hint);
+      } else {
+        const detail = err.response?.data?.detail;
+        setError(
+          typeof detail === 'string'
+            ? detail
+            : Array.isArray(detail)
+              ? detail.map((d) => d.msg || JSON.stringify(d)).join(', ')
+              : 'Login failed. Please try again.'
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -39,11 +55,12 @@ const Login = ({ onLoginSuccess, onShowSignup }) => {
       <div className="max-w-md w-full">
         {/* Logo & Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-900 mb-4 shadow-lg shadow-slate-700/20">
-            <LayoutDashboard className="w-8 h-8 text-white" />
+          <div className="flex justify-center mb-4">
+            <BrandLogo showText={false} size="xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Management Portal</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Sign in to manage your projects and vendors</p>
+          <h1 className="text-2xl font-bold text-hk-gray dark:text-white">{HK_TECH_BRAND.name}</h1>
+          <p className="text-hk-gray-light dark:text-gray-400 mt-1 text-sm">{HK_TECH_BRAND.tagline}</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-3 text-sm">Sign in to your management portal</p>
         </div>
 
         {/* Login Card */}
@@ -64,7 +81,7 @@ const Login = ({ onLoginSuccess, onShowSignup }) => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:ring-2 focus:ring-slate-700 transition-all outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:ring-2 focus:ring-hk-teal transition-all outline-none"
                   placeholder="Enter your username"
                   required
                 />
@@ -79,7 +96,7 @@ const Login = ({ onLoginSuccess, onShowSignup }) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:ring-2 focus:ring-slate-700 transition-all outline-none"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:ring-2 focus:ring-hk-teal transition-all outline-none"
                   placeholder="Enter your password"
                   required
                 />
@@ -89,7 +106,7 @@ const Login = ({ onLoginSuccess, onShowSignup }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-900 hover:bg-slate-950 disabled:opacity-50 text-white font-semibold py-3 rounded-xl shadow-lg shadow-slate-700/20 transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-hk-teal hover:bg-hk-teal-dark disabled:opacity-50 text-white font-semibold py-3 rounded-xl shadow-lg shadow-hk-teal/25 transition-all flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -105,7 +122,7 @@ const Login = ({ onLoginSuccess, onShowSignup }) => {
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               New business? {' '}
-              <button onClick={onShowSignup} className="text-slate-900 dark:text-slate-200 font-semibold hover:underline">
+              <button onClick={onShowSignup} className="text-hk-teal dark:text-hk-teal-light font-semibold hover:underline">
                 Register Company
               </button>
             </p>
@@ -113,7 +130,7 @@ const Login = ({ onLoginSuccess, onShowSignup }) => {
         </div>
 
         <p className="text-center mt-8 text-sm text-gray-400 dark:text-gray-600">
-          aemje architect © 2026
+          {HK_TECH_BRAND.copyright}
         </p>
       </div>
     </div>

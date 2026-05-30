@@ -4,13 +4,35 @@
 Import-Module WebAdministration
 
 $siteName = "Aemje ArchitectApp"
-$port = 8080
+$port = 8089
 $rootPath = $PSScriptRoot
 $frontendPath = Join-Path $rootPath "frontend\build"
 $backendPath = Join-Path $rootPath "backend"
 $appPoolName = "Aemje ArchitectPool"
 
 Write-Host "Setting up IIS for Aemje Architect Project at $rootPath..." -ForegroundColor Cyan
+
+# 0. web.config templates + frontend build for IIS
+$frontendPublicWebConfig = Join-Path $rootPath "frontend\public\web.config"
+$frontendWebConfigExample = Join-Path $rootPath "frontend\public\web.config.example"
+if (!(Test-Path $frontendPublicWebConfig) -and (Test-Path $frontendWebConfigExample)) {
+    Copy-Item $frontendWebConfigExample $frontendPublicWebConfig
+    Write-Host "Copied frontend/public/web.config from example"
+}
+
+$backendWebConfig = Join-Path $backendPath "web.config"
+$backendWebConfigExample = Join-Path $backendPath "web.config.example"
+if (!(Test-Path $backendWebConfig) -and (Test-Path $backendWebConfigExample)) {
+    Copy-Item $backendWebConfigExample $backendWebConfig
+    Write-Host "Copied backend/web.config from example (edit %PYTHON_PATH% in file)"
+}
+
+Write-Host "Building frontend for IIS (REACT_APP_BACKEND_URL=http://localhost:$port)..." -ForegroundColor Cyan
+Push-Location (Join-Path $rootPath "frontend")
+npm install
+$env:REACT_APP_BACKEND_URL = "http://localhost:$port"
+npm run build
+Pop-Location
 
 # 1. Create App Pool
 if (!(Test-Path "IIS:\AppPools\$appPoolName")) {

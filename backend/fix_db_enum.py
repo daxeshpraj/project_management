@@ -29,11 +29,11 @@ async def fix_enum():
     # Also trigger table creation
     from sqlmodel import SQLModel
     # Import all models to register them with SQLModel.metadata
-    from server import LoosePurchase, User, Project, Vendor, Staff, StaffTransaction, GeneralExpense, LooseExpense, ServiceExpense
+    from server import User, Project, Vendor, Staff, StaffTransaction, GeneralExpense, LooseExpense, ServiceExpense
     
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
-        print("Ensured all tables (including LoosePurchase) are created.")
+        print("Ensured all tables are created.")
 
     await engine.dispose()
 

@@ -26,11 +26,15 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "scripts": {
-    "start": "craco start",
-    "dev": "craco start",
+    "start": "cross-env PORT=3001 craco start",
+    "dev": "cross-env PORT=3001 craco start",
+    "prebuild": "node scripts/encode-logo.js",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   },
   "eslintConfig": {
     "extends": [

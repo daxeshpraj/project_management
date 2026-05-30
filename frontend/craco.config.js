@@ -1,6 +1,10 @@
 // craco.config.js
 const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, ".env.development") });
 require("dotenv").config();
+if (!process.env.PORT) {
+  process.env.PORT = "3001";
+}
 
 // Check if we're in development/preview mode (not production build)
 // Craco sets NODE_ENV=development for start, NODE_ENV=production for build
@@ -78,7 +82,12 @@ webpackConfig.devServer = (devServerConfig) => {
     };
   }
 
+  devServerConfig.port = parseInt(process.env.PORT, 10) || 3001;
   devServerConfig.allowedHosts = 'all';
+  devServerConfig.proxy = {
+    '/api': { target: 'http://localhost:8000', changeOrigin: true },
+    '/uploads': { target: 'http://localhost:8000', changeOrigin: true },
+  };
   return devServerConfig;
 };
 

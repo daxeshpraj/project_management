@@ -16,7 +16,6 @@ import Login from "@/components/Login";
 import UserManagement from "@/components/UserManagement";
 import MasterSettings from "@/components/MasterSettings";
 import StaffTransactions from "@/components/StaffTransactions";
-import PurchaseTracking from "@/components/PurchaseTracking";
 import RoleManagement from "@/components/RoleManagement";
 import CompanySettings from "@/components/CompanySettings";
 import Signup from "@/components/Signup";
@@ -44,12 +43,15 @@ import {
   Settings,
   ReceiptText,
   UserCheck,
-  MessageSquare,
   Shield,
   Building2,
 } from "lucide-react";
-// Configure axios defaults
-axios.defaults.baseURL = process.env.REACT_APP_BACKEND_URL;
+import { getApiBaseUrl } from "@/config/api";
+import BrandLogo from "@/components/BrandLogo";
+import { HK_TECH_BRAND } from "@/config/brand";
+
+// Configure axios defaults (same origin on IIS; separate backend in dev)
+axios.defaults.baseURL = getApiBaseUrl();
 
 // Configure axios to send the token with every request
 axios.interceptors.request.use(
@@ -113,18 +115,12 @@ const Sidebar = ({
     className={`${mobile ? "w-64" : isCollapsed ? "w-20" : "w-64"} bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-full transition-all duration-300 ease-in-out z-40`}
   >
     {/* Logo */}
-    <div className="px-3 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center space-x-3 h-[73px]">
-      <img
-        src={company?.logo_url || "/logo.png"}
-        alt={company?.name || "aemje architect"}
-        className="h-10 w-10 object-contain flex-shrink-0"
+    <div className="px-3 py-4 border-b border-hk-teal/20 dark:border-gray-800 h-[73px] flex items-center">
+      <BrandLogo
+        showText={!isCollapsed || mobile}
+        size="md"
+        subtitle={company?.name ? `Workspace: ${company.name}` : HK_TECH_BRAND.tagline}
       />
-      {(!isCollapsed || mobile) && (
-        <div className="min-w-0">
-          <h1 className="text-base font-bold text-gray-900 dark:text-white truncate">{company?.name || "aemje architect"}</h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{company?.tagline || "Business Management"}</p>
-        </div>
-      )}
     </div>
 
     {/* Navigation */}
@@ -140,12 +136,12 @@ const Sidebar = ({
               onClick={() => handleMenuClick(item.id)}
               title={isCollapsed ? item.label : ""}
               className={`w-full flex items-center ${isCollapsed ? "justify-center" : "space-x-3"} px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors ${active
-                ? "bg-slate-50 dark:bg-slate-900/30 text-slate-950 dark:text-slate-500"
+                ? "bg-hk-teal/10 dark:bg-hk-teal/20 text-hk-teal dark:text-hk-teal-light"
                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               data-testid={`nav-${item.id}`}
             >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${active ? "text-slate-900 dark:text-slate-500" : "text-gray-500 dark:text-gray-400"}`} />
+              <Icon className={`w-5 h-5 flex-shrink-0 ${active ? "text-hk-teal dark:text-hk-teal-light" : "text-gray-500 dark:text-gray-400"}`} />
               {(!isCollapsed || mobile) && <span>{item.label}</span>}
             </button>
           );
@@ -160,11 +156,11 @@ const Sidebar = ({
             <div key={item.id} className="relative group">
               <button
                 title={item.label}
-                className={`w-full flex items-center justify-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${hasActive ? "bg-slate-50 dark:bg-slate-900/30 text-slate-950 dark:text-slate-500"
+                className={`w-full flex items-center justify-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${hasActive ? "bg-hk-teal/10 dark:bg-hk-teal/20 text-hk-teal dark:text-hk-teal-light"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
               >
-                <Icon className={`w-5 h-5 ${hasActive ? "text-slate-900 dark:text-slate-500" : "text-gray-500 dark:text-gray-400"}`} />
+                <Icon className={`w-5 h-5 ${hasActive ? "text-hk-teal dark:text-hk-teal-light" : "text-gray-500 dark:text-gray-400"}`} />
               </button>
             </div>
           );
@@ -174,12 +170,12 @@ const Sidebar = ({
           <div key={item.id}>
             <button
               onClick={() => toggleGroup(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors ${hasActive ? "text-slate-950 dark:text-slate-500" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors ${hasActive ? "text-hk-teal dark:text-hk-teal-light" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               data-testid={`nav-${item.id}`}
             >
               <div className="flex items-center space-x-3">
-                <Icon className={`w-5 h-5 ${hasActive ? "text-slate-900 dark:text-slate-500" : "text-gray-500 dark:text-gray-400"}`} />
+                <Icon className={`w-5 h-5 ${hasActive ? "text-hk-teal dark:text-hk-teal-light" : "text-gray-500 dark:text-gray-400"}`} />
                 <span>{item.label}</span>
               </div>
               {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -193,7 +189,7 @@ const Sidebar = ({
                       key={subItem.id}
                       onClick={() => handleMenuClick(subItem.id)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${active
-                        ? "bg-slate-50 dark:bg-slate-900/30 text-slate-950 dark:text-slate-500 font-medium"
+                        ? "bg-hk-teal/10 dark:bg-hk-teal/20 text-hk-teal dark:text-hk-teal-light font-medium"
                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                         }`}
                       data-testid={`nav-${subItem.id}`}
@@ -240,7 +236,7 @@ const Sidebar = ({
       )}
       {(!isCollapsed || mobile) && (
         <div className="px-3 py-1 text-xs text-gray-400 dark:text-gray-500">
-          {company?.name || "aemje architect"} © 2026
+          {HK_TECH_BRAND.copyright}
         </div>
       )}
     </div>
@@ -446,7 +442,6 @@ function App() {
 
     const items = [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, type: "single" },
-      { id: "procurement", label: "Procurement Feed", icon: MessageSquare, type: "single" },
       {
         id: "projects-menu", label: "Projects", icon: Briefcase, type: "group",
         items: [
@@ -588,9 +583,6 @@ function App() {
         <PageWrapper id="loose-expenses" currentPage={currentPage} allowed={isAllowedPage('vendors-menu')}>
           <LooseExpenses {...commonProps} />
         </PageWrapper>
-        <PageWrapper id="procurement" currentPage={currentPage} allowed={isAllowedPage('procurement')}>
-          <PurchaseTracking {...commonProps} />
-        </PageWrapper>
       </>
     );
   };
@@ -649,14 +641,7 @@ function App() {
             <button onClick={() => setSidebarOpen(true)} className="text-gray-600 dark:text-gray-300">
               <Menu className="w-6 h-6" />
             </button>
-            <div className="flex items-center space-x-2">
-              <img
-                src={company?.logo_url || "/logo.png"}
-                alt={company?.name || "aemje"}
-                className="h-8 w-auto object-contain"
-              />
-              <span className="font-semibold text-gray-900 dark:text-white">{company?.name || "aemje architect"}</span>
-            </div>
+            <BrandLogo showText size="sm" />
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="text-gray-600 dark:text-gray-300"

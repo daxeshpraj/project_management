@@ -14,6 +14,13 @@ module.exports = {
     },
     extend: {
       colors: {
+        hk: {
+          teal: "#2D5A57",
+          "teal-dark": "#234846",
+          "teal-light": "#3d726e",
+          gray: "#333333",
+          "gray-light": "#9E9E9E",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
