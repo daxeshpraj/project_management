@@ -14,6 +14,7 @@ echo "==> Stopping app (optional)"
 sudo systemctl stop myapp || true
 
 echo "==> Safety backup of current DB"
+mkdir -p /home/ubuntu/backups
 STAMP=$(date +%Y%m%d_%H%M%S)
 pg_dump -U "$DB_USER" -Fc -f "/home/ubuntu/backups/local_before_${STAMP}.backup" "$DB_NAME"
 

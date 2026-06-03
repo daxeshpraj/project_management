@@ -7,8 +7,8 @@ on:
 
 env:
   EC2_APP_DIR: /home/ubuntu/app2
-  FRONTEND_BUILD_DIR: /home/ubuntu/frontend/build
-  DEFAULT_PUBLIC_API_URL: http://65.1.93.48
+  PUBLIC_API_URL: http://65.1.93.48
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   deploy:
@@ -27,36 +27,61 @@ jobs:
 
       - name: Build React frontend (HK Tech)
         working-directory: frontend
+        env:
+          REACT_APP_BACKEND_URL: ${{ secrets.PUBLIC_API_URL != '' && secrets.PUBLIC_API_URL || 'http://65.1.93.48' }}
+          CI: "false"
         run: |
           npm ci
           npm run build
-        env:
-          REACT_APP_BACKEND_URL: ${{ secrets.PUBLIC_API_URL || 'http://65.1.93.48' }}
-          CI: "false"
+          test -f build/index.html
 
-      - name: Upload frontend build to EC2
+      - name: Archive frontend build
+        run: tar -czf frontend-build.tar.gz -C frontend/build .
+
+      - name: Upload build archive to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          source: "frontend/build/*"
-          target: /home/ubuntu/frontend/build
-          strip_components: 2
+          source: frontend-build.tar.gz
+          target: /home/ubuntu
 
-      - name: Deploy backend and restart services
+      - name: Deploy backend and frontend on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+          script_stop: true
           script: |
             set -e
-            cd ${{ env.EC2_APP_DIR }}
-            git fetch origin main
-            git reset --hard origin/main
-            source venv/bin/activate
-            pip install -r backend/requirements.txt --quiet
+            APP_DIR="/home/ubuntu/app2"
+            BUILD_DIR="/home/ubuntu/frontend/build"
+
+            echo "==> Deploy frontend"
+            mkdir -p "$BUILD_DIR"
+            rm -rf "$BUILD_DIR"/*
+            tar -xzf /home/ubuntu/frontend-build.tar.gz -C "$BUILD_DIR"
+            rm -f /home/ubuntu/frontend-build.tar.gz
+            test -f "$BUILD_DIR/index.html"
+
+            echo "==> Deploy backend code"
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "ERROR: $APP_DIR is not a git repo. Clone the repo there first."
+              exit 1
+            fi
+            cd "$APP_DIR"
+            git pull origin main
+
+            if [ -f venv/bin/activate ]; then
+              source venv/bin/activate
+              pip install -r backend/requirements.txt --quiet
+            else
+              echo "WARNING: venv not found at $APP_DIR/venv"
+            fi
+
+            echo "==> Restart services"
             sudo systemctl restart myapp
             sudo systemctl restart nginx
             echo "Deploy complete."
