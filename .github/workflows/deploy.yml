@@ -7,7 +7,7 @@ on:
 
 env:
   EC2_APP_DIR: /home/ubuntu/app2
-  PUBLIC_API_URL: http://65.1.93.48
+  PUBLIC_API_URL: https://portal.hktech.in
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
       - name: Build React frontend (HK Tech)
         working-directory: frontend
         env:
-          REACT_APP_BACKEND_URL: ${{ secrets.PUBLIC_API_URL != '' && secrets.PUBLIC_API_URL || 'http://65.1.93.48' }}
+          REACT_APP_BACKEND_URL: ${{ env.PUBLIC_API_URL }}
           CI: "false"
         run: |
           npm ci
