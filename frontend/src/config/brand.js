@@ -2,7 +2,7 @@
 export const HK_TECH_BRAND = {
   name: "HK Tech",
   tagline: "Committed to a better Services",
-  logoUrl: "/hk-tech-logo.png",
+  logoUrl: `${process.env.PUBLIC_URL}/hk-tech-logo.png`,
   phone: "+91 91737 85319",
   email: "info@hktech.net.in",
   address:
