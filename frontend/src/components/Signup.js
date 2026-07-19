@@ -206,7 +206,7 @@ const Signup = ({ onBack }) => {
                 onClick={() => {
                   const port = window.location.port || (process.env.NODE_ENV === 'production' ? '8089' : '3001');
                   const host = port === '8089' ? `${formData.subdomain}.localhost` : `${formData.subdomain}.lvh.me`;
-                  window.location.href = `http://${host}:${port}`;
+                  window.location.href = `http://${host}:${port}/app/`;
                 }}
                 className="w-full bg-hk-teal text-white font-semibold py-3 rounded-xl hover:bg-hk-teal-dark"
               >

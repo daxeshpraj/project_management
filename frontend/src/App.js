@@ -77,7 +77,7 @@ axios.interceptors.response.use(
       // but here we just want to trigger a redirect or state change.
       // A simple reload is the most reliable way to reset the app state.
       if (!window.location.pathname.includes("/login")) {
-        window.location.href = "/";
+        window.location.href = "/app/";
       }
     }
     return Promise.reject(error);

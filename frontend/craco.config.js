@@ -41,6 +41,11 @@ let webpackConfig = {
       '@': path.resolve(__dirname, 'src'),
     },
     configure: (webpackConfig) => {
+      // Serve the CRM under /app/* (landing page owns domain root)
+      webpackConfig.output = {
+        ...webpackConfig.output,
+        publicPath: "/app/",
+      };
 
       // Add ignored patterns to reduce watched directories
         webpackConfig.watchOptions = {
@@ -84,6 +89,13 @@ webpackConfig.devServer = (devServerConfig) => {
 
   devServerConfig.port = parseInt(process.env.PORT, 10) || 3001;
   devServerConfig.allowedHosts = 'all';
+  // App is served under /app/*; open that path in the browser
+  devServerConfig.open = ["/app"];
+  devServerConfig.historyApiFallback = {
+    index: "/app/index.html",
+    disableDotRule: true,
+  };
+  // Keep API/uploads at domain root (not under /app)
   devServerConfig.proxy = {
     '/api': { target: 'http://localhost:8000', changeOrigin: true },
     '/uploads': { target: 'http://localhost:8000', changeOrigin: true },
