@@ -66,6 +66,15 @@ async def lifespan(app: FastAPI):
             for table in tables:
                 await conn.execute(text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS company_id VARCHAR REFERENCES company(id)"))
 
+            # Older backups may lack created_at on master tables
+            for table in ("vendortypemaster", "designationmaster", "permissionmapping"):
+                await conn.execute(
+                    text(
+                        f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS "
+                        f"created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                    )
+                )
+
             # Backfill person_name for existing records
             await conn.execute(text("""
                 UPDATE loanrepayment 
